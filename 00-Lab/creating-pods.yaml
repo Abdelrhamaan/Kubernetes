@@ -1,0 +1,139 @@
+# apiVersion: v1
+# kind: Pod
+# metadata:
+#   name: demo
+
+# # spec not needs specific ordering
+# spec: 
+#   volumes:
+#     - name: emptydir-volume
+#       emptyDir: {}
+#     - name: nfs-volume
+#       nfs: 
+#         server: 192.168.245.114 # server ip must be reachable
+#         path: /home/abdelrhman/Kubernetes/shared
+#   containers:
+#     - name: main-containe
+#       image: nginx:alpine
+#       resources:
+#         requests:
+#           memory: "64Mi" # base2(1024)
+#           cpu: "250m" # millicore
+#         limits:
+#           memory: "128Mi"
+#           cpu: "500m"
+#       volumeMounts: 
+#         - name: emptydir-volume # volume name
+#         # if path not found in container it will be created
+#           mountPath: /usr/share/nginx/html #mounted volume inside container / default path for nginx
+#         - name: nfs-volume
+#           mountPath: /mnt/nfs
+#       ports:
+#         - containerPort: 80
+#       livenessProbe:
+#         httpGet:
+#           path: /
+#           port: 80
+#         initialDelaySeconds: 30
+#         periodSeconds: 10
+#     - name: sidecar-container # helper container 
+#       image: busybox
+#       # this will override command which will run container
+#       # make container generating logs to see it
+#       command : ["/bin/sh", "-c", "while true; do echo $(date) '- Sidecar Logging'; sleep 5; done"]
+#       resources:
+#         requests:
+#           memory: "16Mi"
+#           cpu: "110m"
+#         limits:
+#           memory: "32Mi"
+#           cpu: "200m"
+#       volumeMounts:
+#         - name: emptydir-volume
+#           mountPath: /mnt/shared
+#       ports: 
+#         - containerPort: 8000
+
+# # dont forget that command to forward command 
+# # kubectl port-forward pod/demo 9000:80  
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo  # Pod name
+
+spec: 
+  # Define shared volumes
+  volumes:
+    - name: emptydir-volume   # Temporary in-memory shared storage between containers
+      emptyDir: {}
+    - name: nfs-volume         # NFS persistent shared volume
+      nfs: 
+        server: 192.168.245.114  # NFS server IP (must be reachable from Minikube)
+        path: /home/abdelrhman/Kubernetes/shared  # NFS export path
+
+  # Init container to create index.html before the main container starts
+  initContainers:
+    - name: init-html
+      image: busybox
+      command: ["/bin/sh", "-c"]
+      args:
+        - echo "<h1>Hello from NGINX inside Kubernetes</h1>" > /mnt/html/index.html
+      volumeMounts:
+        - name: emptydir-volume
+          mountPath: /mnt/html  # Write the HTML file into this shared volume
+
+  # Main application containers
+  containers:
+    - name: main-containe  # NGINX container (note correct spelling!)
+      image: nginx:alpine   # Lightweight NGINX image
+
+      # Resource requests and limits
+      resources:
+        requests:
+          memory: "64Mi"    # Minimum memory the container needs
+          cpu: "250m"       # Minimum CPU in millicores
+        limits:
+          memory: "128Mi"   # Max memory allowed
+          cpu: "500m"       # Max CPU allowed
+
+      # Mount volumes into the container
+      volumeMounts: 
+        - name: emptydir-volume  # Shared volume with init-container
+          mountPath: /usr/share/nginx/html  # NGINX default web directory
+        - name: nfs-volume
+          mountPath: /mnt/nfs  # Mount NFS inside the container
+
+      # Expose NGINX on port 80
+      ports:
+        - containerPort: 80
+
+      # Liveness probe to check container health
+      livenessProbe:
+        httpGet:
+          path: /
+          port: 80
+        initialDelaySeconds: 30
+        periodSeconds: 10
+
+    - name: sidecar-container  # Helper container that logs something periodically
+      image: busybox
+      command : ["/bin/sh", "-c", "while true; do echo $(date) '- Sidecar Logging'; sleep 5; done"]
+      
+      # Resource requests and limits for sidecar
+      resources:
+        requests:
+          memory: "16Mi"
+          cpu: "110m"
+        limits:
+          memory: "32Mi"
+          cpu: "200m"
+
+      # Mount shared volume (optional for sidecar use)
+      volumeMounts:
+        - name: emptydir-volume
+          mountPath: /mnt/shared
+
+      ports: 
+        - containerPort: 8000  # Not really used but defined
+

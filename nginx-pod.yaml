@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp
+  labels:
+    app: myapp
+spec:
+  containers:
+    - name: myapp
+      image: nginx
+      ports:
+        - containerPort: 80
+          name: web-nginx
+          protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-service
+spec:
+  selector:
+    app: myapp
+  type: NodePort
+  ports:
+    - port: 80           # Expose this to the cluster
+      targetPort: 80     # Map to container's port
+      nodePort: 31234    # External port (or leave out to auto-assign)
