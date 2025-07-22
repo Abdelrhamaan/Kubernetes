@@ -21,7 +21,6 @@ nodes:
 #   --config=kind-config.yaml \
 #   --wait=5m \
 #   --image kindest/node:v1.28.0 \
-#   --network kind-net
 
 
 

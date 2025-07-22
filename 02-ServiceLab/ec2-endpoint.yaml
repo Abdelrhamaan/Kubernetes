@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: my-external-service   # ← must match the Service name
+subsets:
+  - addresses:
+      - ip: 54.226.35.182
+    ports:
+      - name: ssh
+        port: 22
+        protocol: TCP
