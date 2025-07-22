@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-app01
+  labels:
+    name: web-app
+spec:
+  nodeName: k8s-lab-worker            # ← force onto that worker node name 
+  containers:
+  - name: web
+    image: nginx
+    ports:
+      - containerPort: 80
+
+---
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: web-app02
+  labels:
+    name: web-app
+spec:
+  nodeName: k8s-lab-worker            # ← force onto that worker node name
+  containers:
+  - name: web
+    image: nginx
+    ports:
+    -  containerPort: 80

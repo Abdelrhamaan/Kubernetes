@@ -1,0 +1,67 @@
+# kind-config.yaml
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+- role: worker
+- role: worker
+
+
+
+
+# 1- Create a docker bridge network on 172.18.0.0/16
+# docker network create \
+#   --driver bridge \
+#   --subnet 172.18.0.0/16 \
+#   kind-net
+
+# 2- run kind command 
+# kind create cluster \
+#   --name=k8s-lab \
+#   --config=kind-config.yaml \
+#   --wait=5m \
+#   --image kindest/node:v1.28.0 \
+#   --network kind-net
+
+
+
+# 3- attach each node ip manually 
+# control-plane → .10
+# docker network connect --ip 172.19.0.10 kind-net k8s-lab-control-plane
+
+# worker → .11
+# docker network connect --ip 172.19.0.11 kind-net k8s-lab-worker
+
+# worker2 → .12
+# docker network connect --ip 172.19.0.12 kind-net k8s-lab-worker2
+
+
+# 4- create two pods on master cluster 
+# kubectl apply -f pods.yaml
+
+# 5- change default pages for html 
+  # kubectl exec -it web-app01 -- bash 
+  # apt uppdate
+  # apt install -y vim 
+  # vim /usr/share/nginx/html/index.html
+  # make any change and save the file then make the same in the another container
+
+# 6- create service type clusterIp
+  # kubectl apply -f cluster-service.yaml 
+  # cluster ip is just availble inside cluster 
+  # to access it we will make pod which is forward traffic to pods inside cluster 
+  # kubectl run ubuntu --image=ubuntu -it --rm -- /bin/bash ----> we will create it for just one time 
+  # apt update 
+  # apt install -y curl
+  # curl (service-name or fully qualified service name ) 
+  # curl my-cluster-service.default.svc.cluster.local 
+  # you well see nginx html which you changed before
+  # ==========================================================
+  # also you can make forward port to access clusterIp outside it 
+  # kubectl port-forward service/my-cluster-service 9000:80
+  # now you can access it from 127.0.0.1:9000
+
+# 7- make service access by nodePort
+  # kubectl apply -f nodeport-service.yaml
+  # access it by any node ip : service port ---> 172.19.0.12:30007
+
