@@ -52,3 +52,12 @@ spec:
       image: alpine
       command : ["/bin/sh", "-c", "while true; do echo $(date) '- Monitoring Service Running'; sleep 3600; done"]
 ---
+
+
+
+#  label consists of key: value 
+# it can be environment: dev
+# but most people like 
+# prefix/key : value 
+# app.kubernetes.io/name: "monitoring"
+# prefix must be dns complinat 
