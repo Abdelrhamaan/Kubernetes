@@ -1,0 +1,59 @@
+# this ingress will handle routing for services 
+# ingress is like single endpoint which will route requests to right service
+# first run kind delete cluster 
+# second run this command from docs 
+#   (
+      # cat <<EOF | kind create cluster --config=-
+      # kind: Cluster
+      # apiVersion: kind.x-k8s.io/v1alpha4
+      # nodes:
+      # - role: control-plane
+      #   extraPortMappings:
+      #   - containerPort: 80
+      #     hostPort: 80
+      #     protocol: TCP
+      #   - containerPort: 443
+      #     hostPort: 443
+      #     protocol: TCP
+      # EOF
+ # )
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+   name: ingress
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: www.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend: 
+          service:
+            name: www
+            port: 
+              number: 80
+      - path: "/admin"
+        pathType: Exact
+        backend:
+          service:
+            name: admin
+            port:
+              number: 80
+  - host: api.example.com
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend: 
+            service:
+              name: api
+              port:
+                number: 80
+
+# after run all files you need to resolve host name to local host from 
+# sudo vim /etc/hosts
+# 127.0.0.1 www.example.com
+# 127.0.0.1 api.example.com
