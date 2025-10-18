@@ -21,9 +21,18 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-   name: ingress
+  name: ingress
+  #  this line for redirect any http to https
+  annotations: 
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   ingressClassName: nginx
+  # add this line for serving https by self secrets (tls)
+  tls:
+    - hosts:
+        - www.example.com
+        - api.example.com
+      secretName: example-tls-secret
   rules:
   - host: www.example.com
     http:

@@ -1,0 +1,4 @@
+# 1- create self certificate : 
+      # command : openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=example.com/O=example.com"
+# 2- put secrets (certifcate & key ) in secret comp. in k8s: 
+      # command: kubectl create secret tls example-tls-secret --cert=tls.crt --key=tls.key
