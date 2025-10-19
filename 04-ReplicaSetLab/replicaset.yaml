@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata: 
+  name: myapp
+  # replica set labels
+  labels:
+    app: myapp
+spec:
+  replicas: 3
+  # this labels which replica set will manage container with that labels
+  selector:
+    matchLabels:
+      app: myapp
+  template: # containers template (cont. labels must match selectors in replicaset)
+    metadata: 
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: web
+        image: nginx
