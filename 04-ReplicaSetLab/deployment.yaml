@@ -5,15 +5,16 @@ metadata:
   labels:
     app: my-deploy-label
 spec:
-  replicas: 3
+  replicas: 8
   selector:
     matchLabels:
       app: my-pod
   strategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
+    type: Recreate
+    # type: RollingUpdate
+    # rollingUpdate:
+      # maxSurge: 1
+      # maxUnavailable: 1
   progressDeadlineSeconds: 600
   minReadySeconds: 10
   revisionHistoryLimit: 5
@@ -26,7 +27,7 @@ spec:
       - name: my-pod
       # change nginx version to see deployment how manage replicaset in rolling update
       # then apply file then run this command kubectl rollout status deployment my-deploy
-        image: nginx:1.25
+        image: nginx:1.20
         # image: nginx
         ports:
         - containerPort: 80
@@ -57,3 +58,28 @@ spec:
       volumes:
       - name: my-pod-vol
         emptyDir: {}
+
+
+
+# if i when i run this file to update pods from nginx version to another version something wronh happens 
+#  i can make roll back by that command :
+# kubectl rollout undo deployment my-deploy
+
+
+# if i want to rollout but not that version i want version old than that 
+# to try run than imerative command to change image version 
+# kubectl set image deployment/my-deploy my-pod=nginx:1.27
+# kubectl set image deployment/my-deploy my-pod=nginx:1.24
+# kubectl set image deployment/my-deploy my-pod=nginx:1.22
+# =========================================================
+# to see history 
+# kubectl rollout history deployment/my-deploy
+# kubectl rollout history deployment/my-deploy --revision=3
+# to return to specific revision:
+# kubectl rollout undo deployment my-deploy --to-revision=2
+# =========================================================
+# change - cause alwasy none but you can use it to say why we made that change 
+# you can make it by annotation in delcartive or imperative way by add change cause in annotation
+# =========================================================
+# how to make recreate strategy  in deployment.yaml
+
