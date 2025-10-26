@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: DaemonSet 
+metadata:
+  name: my-daemon
+  labels:
+    app: fluentd
+spec:
+  selector:
+    matchLabels:
+      app: fluentd
+  template:
+    metadata:
+      labels:
+        app: fluentd
+    spec:
+      # run also this command to give label to node 
+      # kubectl label node kind-worker role=logging
+      nodeSelector:
+        role: logging   # 🟢 Run only on nodes with this label
+      containers:
+        - name: fluentd
+          image: fluent/fluentd:v1.17.1-1.0
