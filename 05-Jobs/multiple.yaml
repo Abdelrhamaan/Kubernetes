@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: multiple
+spec:
+  completions: 5
+  parallelism: 2
+  template:
+    spec:
+      containers:
+        - name: multiple
+          image: busybox
+          command: ["sh", "-c", "echo 'processing $(MY_CHUNK)' && sleep 15 && echo 'processing finished $(MY_CHUNK)'"]
+          env:
+            - name: MY_CHUNK
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+      restartPolicy: Never
