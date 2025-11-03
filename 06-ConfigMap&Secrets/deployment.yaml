@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: configmap-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-app
+  template:
+    metadata:
+      labels:
+        app: demo-app
+    spec:
+      containers:
+        - name: demo-container
+          image: nginx
+          # first way for config map  by env variables
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: DATABASE_URL
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: LOG_LEVEL
+            - name: MAX_CONNECTIONS
+              valueFrom:
+                configMapKeyRef:
+                  name: app-config
+                  key: MAX_CONNECTIONS
+            - name: BD_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-password
+                  key: BD_PASSWORD
+          # second way by volumes mount 
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: app-config
+
+
+
+# run this command to see env on container 
+# kubectl exec -it configmap-demo-849cdb78b8-c5qsg -- env
+# TO see varibales in mounted files 
+#  kubectl exec -it configmap-demo-849cdb78b8-c5qsg -- cat /etc/config/DATABASE_URL 
