@@ -1,0 +1,15 @@
+# headless service is same service but with clusetIP None
+# you can make usual service like nodePort, loadbalancer, but 
+# you must make headless service for statefulset to use it 
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  labels:
+    app: mysql
+spec:
+  ports:
+    - port: 3306
+  clusterIP: None
+  selector:
+    app: mysql

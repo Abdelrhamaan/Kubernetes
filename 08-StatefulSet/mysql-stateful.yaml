@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  serviceName: "mysql"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mysql
+  template: 
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:5.7
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: "rootpassword"
+          volumeMounts:
+            # presistent mount volume 
+            # must be outside cluster
+            - name: mysql-data
+              mountPath: /var/lib/mysql
+            # config map
+            - name: mysql-init
+            # path in image which use to read sql statement then apply it on database
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: mysql-init
+          configMap:
+            name: mysql-configmap
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 3Gi
+        # provided from kind not real storage outside cluster 
+        # just for testing 
+        # on ebs on aws you should use storage controller provided from cloud(aws)
+        storageClassName: standard
+
+
+
+# to see pvc run 
+# kubectl get pvc          
+# NAME                 STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+# mysql-data-mysql-0   Bound    pvc-b8234928-2b1d-4b85-9826-36a14ce99dcb   3Gi        RWO            standard       <unset>                 84s
+# mysql-data-mysql-1   Bound    pvc-419cf6d3-fa5e-435e-a759-b185c9f20e6c   3Gi        RWO            standard       <unset>                 56s
+# mysql-data-mysql-2   Bound    pvc-fc83bc05-00d3-4c92-b4cd-4fdf3682dd96   3Gi        RWO            standard       <unset>  
+
+
+# to show mysql database 
+# kubectl exec -it mysql-0 -- mysql -u root -prootpassword
+# show databases;
