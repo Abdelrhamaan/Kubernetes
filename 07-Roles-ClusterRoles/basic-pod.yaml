@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: simple-pod
+  namespace: rbac-lab
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+
+#  try this command to create with specific user 
+# kubectl create -f 07-Roles-ClusterRoles/basic-pod.yaml --as=system:serviceaccount:rbac-lab:dev-user
+# if you try to delete he will tell you that forbidden 
+# kubectl delete -f 07-Roles-ClusterRoles/basic-pod.yaml --as=system:serviceaccount:rbac-lab:dev-user
+# Error from server (Forbidden): error when deleting "07-Roles-ClusterRoles/basic-pod.yaml": pods "simple-pod" is forbidden: User "system:serviceaccount:rbac-lab:dev-user" cannot delete resource "pods" in API group "" in the namespace "rbac-lab"
