@@ -1,0 +1,7 @@
+1- create deployment file
+2- create service file
+3- create sercret key imperative way 
+    - kubectl create secret generic weather \     
+    --from-literal=apikey='051be231b3msh2b55c10efedfedcp18d371jsn85bac2b25980'
+    - kubectl apply -f weather/deployment.yaml 
+    -  kubectl apply -f weather/service.yaml

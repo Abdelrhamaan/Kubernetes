@@ -4,6 +4,8 @@ metadata:
   name: mysql
 spec:
   serviceName: mysql
+  # if you don't have mysql on premise clusters make replica with 1 
+  # if it more than one there will be more than mysql db and data wil be inconsesitency
   replicas: 1
   selector: 
     matchLabels:

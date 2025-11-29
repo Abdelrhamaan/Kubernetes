@@ -9,6 +9,8 @@ spec:
         - name: mysql-init-container
           image: mysql:5.7
           env:
+            # this is my sql env 
+            # used to login on mysql 
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -17,6 +19,7 @@ spec:
             - name: MYSQL_AUTH_PASSWORD
               valueFrom:
                 secretKeyRef:
+                # used to login with the user not root user 
                   name: mysql-secret
                   key: auth-password
             - name: MYSQL_HOST
@@ -24,6 +27,7 @@ spec:
             - name: MYSQL_PORT
               value: "3306"   # must be string, not integer
           command: ["/bin/sh", "-c"]
+          # EOF allow to run more than one command
           args:
             - |
               mysql -h${MYSQL_HOST} -P${MYSQL_PORT} -uroot -p${MYSQL_ROOT_PASSWORD} <<EOF

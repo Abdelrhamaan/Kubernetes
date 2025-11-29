@@ -1,0 +1,10 @@
+1- create deployment file
+2- create service file
+3- create ingress object to allow users connect to my services
+    - we will make it http and https
+    - we will use self certificate to make it https:
+        -   openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=weatherapp.local/O=weatherapp"
+    - use them to make secret to allow ingress use it to make https service
+        - kubectl create secret tls weatherapp-ui-tls --cert=tls.crt --key=tls.key 
+    - make ingress object yaml file 
+        -     
